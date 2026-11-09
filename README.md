@@ -9,7 +9,12 @@ Launch video for Vision Studios (VZN), built with [Remotion](https://www.remotio
 npm i
 npm run dev            # Remotion Studio: preview and scrub in the browser
 npm run render         # out/vzn-launch-vertical.mp4, ready to upload
+npm run render:master  # out/VZN-Launch-Vertical-ProRes-HQ.mov, best quality (~960 MB)
 ```
+
+`render:master` is the file to keep and compress from: ProRes 422 HQ (10-bit), lossless
+frames, uncompressed audio. To write it somewhere else, e.g. straight into Downloads:
+`npx remotion render LaunchVertical ~/Downloads/VZN-Launch-Vertical-ProRes-HQ.mov --codec=prores --prores-profile=hq --image-format=png --audio-codec=pcm-16 --color-space=bt709`
 
 `npm run render` caps the bitrate at 14 Mbps (about 60 MB). The film grain changes every
 frame, which video compression can't squeeze, so an uncapped render comes out around
