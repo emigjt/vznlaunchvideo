@@ -15,3 +15,6 @@ export const fonts = {
 };
 
 export const FPS = 30;
+
+// Shown on the end card. Swap in the studio's own domain once it has one.
+export const SITE_URL = "emigjt.github.io/vznstudiowebpage";
