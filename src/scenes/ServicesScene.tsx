@@ -1,10 +1,10 @@
 import React from "react";
 import { createSmoothSvgPath, useWindowedAudioData, visualizeAudio, visualizeAudioWaveform } from "@remotion/media-utils";
 import { AbsoluteFill, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { colors, fonts } from "../brand";
+import { colors, display, fonts } from "../brand";
 import { hit, SCENE_START } from "../beat";
 import { env } from "../audio-envelope";
-import { fitSize } from "../metrics";
+import { textWidthEm } from "../metrics";
 import { Cut } from "../fx/Cut";
 import { flicker } from "../fx/flicker";
 import { Frag } from "../fx/Frag";
@@ -46,8 +46,9 @@ type TitleProps = { index: number; lines: { text: string; at: number; italic?: b
 const ServiceTitle: React.FC<TitleProps> = ({ index, lines, seed, slash = false }) => {
   const frame = useCurrentFrame();
   const { title, visual, u, vertical } = useRegions();
-  const longest = lines.reduce((a, l) => (l.text.length > a.length ? l.text : a), "");
-  const size = fitSize(longest, title.width, (vertical ? 190 : 210) * u);
+  // Size to the widest line, counting the slash in front of the second line.
+  const widths = lines.map((l, i) => textWidthEm(slash && i === 1 ? `/ ${l.text}` : l.text));
+  const size = Math.min((vertical ? 190 : 210) * u, title.width / Math.max(...widths));
   // In 16:9 the block is centred on the portfolio piece beside it.
   const label = (vertical ? 26 : 22) * u;
   const blockHeight = label * 1.2 + 18 * u + lines.length * size;
@@ -72,7 +73,11 @@ const ServiceTitle: React.FC<TitleProps> = ({ index, lines, seed, slash = false 
           }}
         >
           {slash && i === 1 ? (
-            <span style={{ display: "inline-block", width: size * 0.05, height: size * 0.62, background: colors.text, rotate: "22deg" }} />
+            display.punctuation ? (
+              <span>/</span>
+            ) : (
+              <span style={{ display: "inline-block", width: size * 0.05, height: size * 0.62, background: colors.text, rotate: "22deg" }} />
+            )
           ) : null}
           {l.text}
         </div>

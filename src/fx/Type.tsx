@@ -1,6 +1,6 @@
 import React from "react";
 import { Easing, Interactive, interpolate, useCurrentFrame } from "remotion";
-import { colors, fonts } from "../brand";
+import { colors, display, fonts } from "../brand";
 import { fitSize, type Face } from "../metrics";
 import { flicker } from "./flicker";
 
@@ -9,6 +9,12 @@ const family: Record<Face, React.CSSProperties> = {
   italic: { fontFamily: fonts.display, fontStyle: "italic" },
   outline: { fontFamily: fonts.outline, fontStyle: "normal" },
 };
+
+/** Colour of a word, drawn as an outline when the face is "outline" and the font has none. */
+export const ink = (face: Face, color: string): React.CSSProperties =>
+  face === "outline" && display.strokeOutline
+    ? { color: "transparent", WebkitTextStroke: `0.02em ${color}` }
+    : { color };
 
 type WordProps = {
   text: string;
@@ -27,7 +33,7 @@ type WordProps = {
   style?: React.CSSProperties;
 };
 
-/** One big word (or a few) in Coldag Serif, sized to fit and drifting slowly toward the viewer. */
+/** One big word (or a few) in the display font, sized to fit and drifting slowly toward the viewer. */
 export const Word: React.FC<WordProps> = ({
   text,
   face = "bold",
@@ -59,11 +65,11 @@ export const Word: React.FC<WordProps> = ({
           fontSize: size,
           lineHeight: 1,
           letterSpacing: `${tracking}em`,
-          color,
+          ...ink(face, color),
           whiteSpace: "pre",
-          // Coldag's capitals sit low in the line box; lift them to the optical centre.
+          // Capitals sit low in the line box; lift them to the optical centre.
           position: "relative",
-          top: "-0.08em",
+          top: display.lift,
           scale: interpolate(frame, [0, duration], [1, 1 + push], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",

@@ -39,8 +39,9 @@ line, with every cut landing on a hit of the beat:
 | 9–12 | Music production / Mixing, Mastering / Cover art / Merchandising | beat catalogue and live spectrum; live waveform and meters; artwork cutting on the 808s; the hoodie |
 | 13–16 | Don't let it all slow you down from creating. Vision Studios: Your sound. Your vision. | the work flickers around "creating"; logo lockup and site address |
 
-Look: black and bone, greyscale only, Coldag Serif for the words ("vision" in italic, as on
-the site) and Patchcode for the HUD. Cuts are hard and stutter for a frame or two on the
+Look: black and bone, greyscale only, Hitchcut for the words ("vision" slanted) and Patchcode
+for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the
+website's face). Cuts are hard and stutter for a frame or two on the
 way in and out; heavy hits add a white flash, an inverted frame, a tape tear or a small
 shake. Film grain and scratches change every frame.
 
@@ -65,11 +66,12 @@ src/fx/                 Cut (flickering layer), Word and Mono (type), Frag (artw
                         Logo, Slices (tape tear), HUD, Grain, Scratches, layout
 src/beat.ts             Beat grid of Wanderer
 src/audio-envelope.ts   Per-frame bass, loudness and hit levels of Wanderer (precomputed)
-src/metrics.ts          Coldag Serif glyph widths, to size words to the frame
+src/metrics.ts          Display font glyph widths, to size words to the frame
 src/brand.ts            Colours, fonts, site address
 src/fonts.ts            Loads the self-hosted brand fonts
 public/brand/           Logos (white, black, currentColor)
-public/fonts/           Coldag Serif (Bold, Italic, Outline), Patchcode
+public/fonts/           Hitchcut, Coldag Serif (Bold, Italic, Outline), Patchcode;
+                        source/ holds Hitchcut's original OTF and TTF
 public/audio/           The seven beats (320 kbps MP3)
 public/visual/          Posters and artwork (1600 px)
 public/shop/            VZN Logo Hoodie, charcoal and grey, front and back

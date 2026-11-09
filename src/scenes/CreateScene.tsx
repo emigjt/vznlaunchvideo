@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Easing, interpolate, random, useCurrentFrame } from "remotion";
-import { colors, fonts, SITE_URL } from "../brand";
+import { colors, display, fonts, SITE_URL } from "../brand";
 import { hit, SCENE_START, TOTAL } from "../beat";
 import { fitSize } from "../metrics";
 import { Cut } from "../fx/Cut";
@@ -8,7 +8,7 @@ import { flicker } from "../fx/flicker";
 import { Frag } from "../fx/Frag";
 import { useLayout } from "../fx/layout";
 import { Logo } from "../fx/Logo";
-import { Mono, ScriptLine, Word } from "../fx/Type";
+import { ink, Mono, ScriptLine, Word } from "../fx/Type";
 
 // Bars 13–16: "Don't let it all slow you down from creating." and the sign-off
 // "Vision Studios: Your sound. Your vision."
@@ -43,10 +43,11 @@ const SlowDown: React.FC<{ duration: number }> = ({ duration }) => {
             style={{
               position: "absolute",
               fontFamily: last ? fonts.display : fonts.outline,
+              ...(last ? {} : ink("outline", colors.text)),
               fontSize: size,
               lineHeight: 1,
               letterSpacing: `${s.tracking}em`,
-              color: colors.text,
+              ...(last ? { color: colors.text } : {}),
               whiteSpace: "pre",
               opacity: last ? 1 : 0.12 + i * 0.08,
               translate: `0px ${s.y - size * 0.08}px`,
@@ -84,10 +85,10 @@ const SCATTER_VERTICAL: [string, number, number][] = [
   ["visual/snake-eyes.jpg", 0.5, 0.74],
 ];
 
-/** "Your sound. Your vision." with drawn full stops (Coldag has none). */
+/** "Your sound. Your vision." (with drawn full stops if the font has none). */
 const Slogan: React.FC<{ size: number; secondAt: number }> = ({ size, secondAt }) => {
   const frame = useCurrentFrame();
-  const stop = <span style={{ display: "inline-block", width: size * 0.11, height: size * 0.11, background: colors.text, marginLeft: size * 0.05 }} />;
+  const stop = display.punctuation ? "." : <span style={{ display: "inline-block", width: size * 0.11, height: size * 0.11, background: colors.text, marginLeft: size * 0.05 }} />;
   return (
     <div style={{ fontFamily: fonts.display, fontSize: size, lineHeight: 1, color: colors.text, display: "flex", gap: size * 0.32, alignItems: "baseline" }}>
       <span>Your sound{stop}</span>
