@@ -27,6 +27,7 @@
   },
   "scripts": {
     "dev": "remotion studio",
+    "render": "remotion render LaunchVertical out/vzn-launch-vertical.mp4 --crf=23 --max-rate=14M --buffer-size=28M --x264-preset=slow --audio-bitrate=256k",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
     "lint": "eslint src && tsc"

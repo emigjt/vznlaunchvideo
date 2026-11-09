@@ -8,8 +8,12 @@ Launch video for Vision Studios (VZN), built with [Remotion](https://www.remotio
 ```bash
 npm i
 npm run dev            # Remotion Studio: preview and scrub in the browser
-npx remotion render LaunchVertical out/vzn-launch-vertical.mp4
+npm run render         # out/vzn-launch-vertical.mp4, ready to upload
 ```
+
+`npm run render` caps the bitrate at 14 Mbps (about 60 MB). The film grain changes every
+frame, which video compression can't squeeze, so an uncapped render comes out around
+470 MB, too big for the apps' upload limits and no better once they re-compress it.
 
 ## Compositions
 
