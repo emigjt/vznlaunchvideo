@@ -22,7 +22,7 @@ frame, which video compression can't squeeze, so an uncapped render comes out ar
 
 ## Compositions
 
-- `LaunchVertical`: 1080×1920, 30 fps, 33 s. The social cut (TikTok, Reels, Shorts).
+- `LaunchVertical`: 1080×1920, 30 fps, 34 s. The social cut (TikTok, Reels, Shorts).
 - `LaunchWide`: 1920×1080. Parked for now: it renders from the same scenes but hasn't been
   tuned since the focus moved to vertical.
 - `Scenes/…`: each scene on its own (9:16, without the music, grain and HUD) for editing.
@@ -30,20 +30,23 @@ frame, which video compression can't squeeze, so an uncapped render comes out ar
 ## The video
 
 The script is set as typography over **Wanderer** (VZN, 122 BPM), lowercase except
-"Vision Studios", with every cut landing on a hit of the beat. Each piece of the portfolio
-first appears with the service that introduces it:
+"Vision Studios". Every line lands whole on its beat and stays on screen together while
+it's read. Each piece of the portfolio first appears with the service that introduces it:
 
 | Bars | Line | On screen |
 |---|---|---|
-| 1–4 | every artist has a vision. | one word per hit; "vision." becomes the eye logo |
-| 5–6 | at Vision Studios, we bring that vision to life. | type only, building down the screen a word on nearly every other sixteenth |
+| 1–3 | every artist has a vision. | the whole line; on the clap of bar 3 it flashes and becomes the eye logo |
+| 4 | (the eye) | the eye holds through the fill |
+| 5–6 | at Vision Studios, we bring that vision to life. | the whole line, large, type only |
 | 7 | music production | the beat catalogue and a live spectrum |
 | 8 | mixing / mastering | a live waveform and level meters |
 | 9 | cover art | the posters and album cover, cutting on the hits |
 | 10 | merchandising | the hoodie, flipping front and back |
-| 11–12 | don't let it get in the way of creation. | one word or phrase per hit from the loudest downbeat; the work flickers around "creation." |
-| 13–14 | let us help build your vision. | one word or phrase per hit |
-| 15–16 | Vision Studios: your sound. your vision. | logo lockup and site address |
+| 11 | we handle it all. | the loudest downbeat; all four services around it at once |
+| 12 | you focus on creating. | the work flickers around it |
+| 13–14 | let us help build your vision. | the whole line |
+| 15–16 | Vision Studios: your sound. your vision. | the logo, with the sign-off beneath it |
+| end | website live now :) | with the site address, held 2.5 s past the music |
 
 Look: black and bone, greyscale only, Hitchcut for the words ("vision" slanted) and Patchcode
 for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the

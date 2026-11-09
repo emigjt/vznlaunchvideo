@@ -19,13 +19,13 @@ export const BEAT = (60 / BPM) * FPS;
 export const BAR = BEAT * 4;
 
 /**
- * First frame of each scene: the opening line (bars 1–4), "at Vision Studios…" (bars 5–6),
- * the services (bars 7–10, one each), and the close (bars 11–16 and the tail).
+ * First frame of each scene: the opening line and the eye (bars 1–4), "at Vision Studios…"
+ * (bars 5–6), the services (bars 7–10, one each), and the close (bars 11–16 and the tail).
  */
 export const SCENE_START = [0, hit(5), hit(7), hit(11)] as const;
 export const MUSIC_END = Math.round(31.475 * FPS);
-/** The end card holds a little past the music. */
-export const TOTAL = MUSIC_END + Math.round(1.5 * FPS);
+/** The end card holds past the music, long enough to read the website line and address. */
+export const TOTAL = MUSIC_END + Math.round(2.5 * FPS);
 
 /** Which bar (1–16) an absolute frame falls in. */
 export const barAt = (frame: number): number =>

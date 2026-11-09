@@ -15,17 +15,18 @@ import { StudioScene } from "./scenes/StudioScene";
 import { VisionScene } from "./scenes/VisionScene";
 
 // Hits that get a full-frame flash: one frame of bone, then one frame of the picture
-// inverted. "vision.", cover art (where the track gets fuller and the artwork first
-// appears), "don't" (the loudest downbeat) and the logo. The services and "creation."
-// open on an inverted frame.
+// inverted. "vision" turning into the eye, cover art (where the track gets fuller and the
+// artwork first appears), "we handle it all." (the loudest downbeat) and the logo. The
+// services and "you focus on creating." open on an inverted frame.
 const WHITE = new Set([hit(3, 9), hit(9, 1), hit(11, 1), hit(15, 1)]);
-const INVERT = new Set([hit(3, 9) + 1, hit(7, 1), hit(9, 1) + 1, hit(11, 1) + 1, hit(12, 9), hit(15, 1) + 1]);
+const INVERT = new Set([hit(3, 9) + 1, hit(7, 1), hit(9, 1) + 1, hit(11, 1) + 1, hit(12, 1), hit(15, 1) + 1]);
 
 // Frames where the picture tears sideways: the eye landing, the 808 fills that close each
-// section, the service changes, "the way", and the logo landing.
+// section, the service changes, and the logo landing.
 const tear = (bar: number, step: number) => [hit(bar, step), hit(bar, step) + 1];
 const GLITCH = new Set([
-  ...tear(4, 3),
+  hit(3, 9) + 2,
+  hit(3, 9) + 3,
   ...tear(4, 13),
   ...tear(4, 15),
   ...tear(6, 15),
@@ -33,7 +34,6 @@ const GLITCH = new Set([
   ...tear(8, 13),
   ...tear(8, 15),
   ...tear(10, 1),
-  ...tear(11, 13),
   ...tear(12, 13),
   ...tear(12, 15),
   hit(15, 1) + 2,
@@ -75,10 +75,10 @@ export const LaunchVideo: React.FC = () => {
             <Series.Sequence name="at Vision Studios, we bring that vision to life." durationInFrames={SCENE_START[2] - SCENE_START[1]}>
               <StudioScene />
             </Series.Sequence>
-            <Series.Sequence name="Services" durationInFrames={SCENE_START[3] - SCENE_START[2]}>
+            <Series.Sequence name="services" durationInFrames={SCENE_START[3] - SCENE_START[2]}>
               <ServicesScene />
             </Series.Sequence>
-            <Series.Sequence name="don't let it get in the way of creation. let us help build your vision." durationInFrames={TOTAL - SCENE_START[3]}>
+            <Series.Sequence name="we handle it all. you focus on creating. let us help build your vision." durationInFrames={TOTAL - SCENE_START[3]}>
               <CreateScene />
             </Series.Sequence>
           </Series>
