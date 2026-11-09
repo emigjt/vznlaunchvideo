@@ -15,29 +15,31 @@ import { StudioScene } from "./scenes/StudioScene";
 import { VisionScene } from "./scenes/VisionScene";
 
 // Hits that get a full-frame flash: one frame of bone, then one frame of the picture
-// inverted. "vision" turning into the eye, cover art (where the track gets fuller and the
-// artwork first appears), "we handle it all." (the loudest downbeat) and the logo. The
-// services and "you focus on creating." open on an inverted frame.
-const WHITE = new Set([hit(3, 9), hit(9, 1), hit(11, 1), hit(15, 1)]);
-const INVERT = new Set([hit(3, 9) + 1, hit(7, 1), hit(9, 1) + 1, hit(11, 1) + 1, hit(12, 1), hit(15, 1) + 1]);
+// inverted. "vision." becoming the eye, cover art (where the track gets fuller), the loudest
+// downbeat (during "let us help build your vision.") and the logo. Lines and services that
+// land on a downbeat open on an inverted frame.
+const WHITE = new Set([hit(2, 9), hit(9, 1), hit(15, 1), hit(16, 1)]);
+const INVERT = new Set([hit(2, 9) + 1, hit(3, 1), hit(6, 1), hit(9, 1) + 1, hit(12, 1), hit(15, 1) + 1, hit(16, 1) + 1]);
 
-// Frames where the picture tears sideways: the eye landing, the 808 fills that close each
-// section, the service changes, and the logo landing.
+// Frames where the picture tears sideways: "vision." glitching into the eye, the 808 fills
+// that close each phrase, the services changing on the claps, and the logo landing.
 const tear = (bar: number, step: number) => [hit(bar, step), hit(bar, step) + 1];
 const GLITCH = new Set([
-  hit(3, 9) + 2,
-  hit(3, 9) + 3,
+  hit(2, 4),
+  hit(2, 6),
+  hit(2, 8),
+  hit(2, 9) + 2,
+  hit(2, 9) + 3,
   ...tear(4, 13),
   ...tear(4, 15),
-  ...tear(6, 15),
-  ...tear(8, 1),
+  ...tear(7, 9),
   ...tear(8, 13),
   ...tear(8, 15),
-  ...tear(10, 1),
+  ...tear(10, 9),
   ...tear(12, 13),
   ...tear(12, 15),
-  hit(15, 1) + 2,
-  hit(15, 1) + 3,
+  hit(16, 1) + 2,
+  hit(16, 1) + 3,
   ...tear(16, 13),
   ...tear(16, 15),
 ]);
@@ -72,13 +74,13 @@ export const LaunchVideo: React.FC = () => {
             <Series.Sequence name="every artist has a vision." durationInFrames={SCENE_START[1] - SCENE_START[0]}>
               <VisionScene />
             </Series.Sequence>
-            <Series.Sequence name="at Vision Studios, we bring that vision to life." durationInFrames={SCENE_START[2] - SCENE_START[1]}>
+            <Series.Sequence name="at Vision Studios, we bring that vision to life. whatever you need." durationInFrames={SCENE_START[2] - SCENE_START[1]}>
               <StudioScene />
             </Series.Sequence>
             <Series.Sequence name="services" durationInFrames={SCENE_START[3] - SCENE_START[2]}>
               <ServicesScene />
             </Series.Sequence>
-            <Series.Sequence name="we handle it all. you focus on creating. let us help build your vision." durationInFrames={TOTAL - SCENE_START[3]}>
+            <Series.Sequence name="we handle it all. completely streamlined... let us help build your vision." durationInFrames={TOTAL - SCENE_START[3]}>
               <CreateScene />
             </Series.Sequence>
           </Series>

@@ -22,7 +22,7 @@ frame, which video compression can't squeeze, so an uncapped render comes out ar
 
 ## Compositions
 
-- `LaunchVertical`: 1080×1920, 30 fps, 34 s. The social cut (TikTok, Reels, Shorts).
+- `LaunchVertical`: 1080×1920, 30 fps, 33 s. The social cut (TikTok, Reels, Shorts).
 - `LaunchWide`: 1920×1080. Parked for now: it renders from the same scenes but hasn't been
   tuned since the focus moved to vertical.
 - `Scenes/…`: each scene on its own (9:16, without the music, grain and HUD) for editing.
@@ -31,22 +31,22 @@ frame, which video compression can't squeeze, so an uncapped render comes out ar
 
 The script is set as typography over **Wanderer** (VZN, 122 BPM), lowercase except
 "Vision Studios". Every line lands whole on its beat and stays on screen together while
-it's read. Each piece of the portfolio first appears with the service that introduces it:
+it's read. Each piece of the portfolio first appears with the service that introduces it,
+and the services get the most time:
 
-| Bars | Line | On screen |
+| Time | Line | On screen |
 |---|---|---|
-| 1–3 | every artist has a vision. | the whole line; on the clap of bar 3 it flashes and becomes the eye logo |
-| 4 | (the eye) | the eye holds through the fill |
-| 5–6 | at Vision Studios, we bring that vision to life. | the whole line, large, type only |
-| 7 | music production | the beat catalogue and a live spectrum |
-| 8 | mixing / mastering | a live waveform and level meters |
-| 9 | cover art | the posters and album cover, cutting on the hits |
-| 10 | merchandising | the hoodie, flipping front and back |
-| 11 | we handle it all. | the loudest downbeat; all four services around it at once |
-| 12 | you focus on creating. | the work flickers around it |
-| 13–14 | let us help build your vision. | the whole line |
-| 15–16 | Vision Studios: your sound. your vision. | the logo, with the sign-off beneath it |
-| end | website live now :) | with the site address, held 2.5 s past the music |
+| 0–3.9 s | every artist has a vision. | "vision." glitches into the eye logo in its place, and the eye grows to fill the screen |
+| 3.9–7.9 s | at Vision Studios, we bring that vision to life. | the whole line, large, type only |
+| 7.9–9.8 s | whatever you need. | type only |
+| 9.8–12.8 s | music production | the beat catalogue and a live spectrum |
+| 12.8–15.8 s | mixing / mastering | a live waveform and level meters |
+| 15.8–18.7 s | cover art | all five artworks, large, cutting on the hits |
+| 18.7–21.6 s | merchandising | the hoodie in both colours, front and back |
+| 21.6–23.6 s | we handle it all. | all four services around it at once |
+| 23.6–26.6 s | completely streamlined so you focus on creating. | the work flickers around it |
+| 26.6–29.5 s | let us help build your vision. | across the loudest downbeat |
+| 29.5 s to end | Vision Studios: your sound. your vision. | the logo on the last bar, held 1.5 s past the music |
 
 Look: black and bone, greyscale only, Hitchcut for the words ("vision" slanted) and Patchcode
 for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the
@@ -62,7 +62,6 @@ apps put their caption and buttons.
 - **Timing:** `src/beat.ts` maps the beat (`hit(bar, step)` = the frame of a sixteenth-step,
   counted like the music, bar 1–16, step 1–16). Scenes place everything with it.
 - **Words and images:** one file per scene in `src/scenes/`.
-- **Site address on the end card:** `SITE_URL` in `src/brand.ts`.
 - **Flashes and tears:** the `WHITE`, `INVERT` and `GLITCH` lists in `src/LaunchVideo.tsx`.
 
 ## Structure

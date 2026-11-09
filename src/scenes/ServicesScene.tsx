@@ -11,19 +11,22 @@ import { Frag } from "../fx/Frag";
 import { useLayout } from "../fx/layout";
 import { Mono } from "../fx/Type";
 
-// Bars 7–10: "music production, mixing/mastering, cover art, merchandising."
-// One service per bar, each cut in on the downbeat with its own piece of the portfolio:
-// the beat catalogue and a live spectrum, a live waveform with level meters, a montage of
-// the artwork cutting on the 808s, and the hoodie flipping on the hits.
+// Bars 6–11: "music production, mixing/mastering, cover art, merchandising."
+// Each service gets a bar and a half, cutting in on a downbeat or a clap, with its piece
+// of the portfolio large: the beat catalogue and a live spectrum, a live waveform with
+// level meters, all five artworks cutting on the hits, and the hoodie in both colours.
 const START = SCENE_START[2];
-// One service per bar. Each one's portfolio pieces appear only from its own bar on.
-const PRODUCTION = 7;
-const MIXING = 8;
-const COVER_ART = 9;
-const MERCH = 10;
 
-/** Frame of a hit relative to a service that starts on the downbeat of `firstBar`. */
-const rel = (firstBar: number) => (bar: number, step = 1) => hit(bar, step) - hit(firstBar);
+// Where each service starts [bar, step]. Its portfolio pieces appear only from there on.
+type At = [number, number];
+const PRODUCTION: At = [6, 1];
+const MIXING: At = [7, 9];
+const COVER_ART: At = [9, 1];
+const MERCH: At = [10, 9];
+const DONE: At = [12, 1];
+
+/** Frame `steps` sixteenths after a service starts, counted from that start. */
+const rel = (start: At) => (steps: number) => hit(start[0], start[1] + steps) - hit(start[0], start[1]);
 
 const useRegions = () => {
   const { width, height, vertical, u, pad } = useLayout();
@@ -35,11 +38,11 @@ const useRegions = () => {
     pad,
     // Where the title block goes...
     title: vertical
-      ? { left: pad * 1.4, top: height * 0.5, width: width - pad * 2.8 }
+      ? { left: pad * 1.4, top: height * 0.6, width: width - pad * 2.8 }
       : { left: pad * 2, top: 0, width: width * 0.44 },
     // ...and the portfolio piece.
     visual: vertical
-      ? { x: width / 2, y: height * 0.3, w: width - pad * 3, h: height * 0.32 }
+      ? { x: width / 2, y: height * 0.335, w: width * 0.84, h: height * 0.45 }
       : { x: width * 0.735, y: height * 0.47, w: width * 0.34, h: height * 0.6 },
   };
 };
@@ -52,7 +55,7 @@ const ServiceTitle: React.FC<TitleProps> = ({ index, lines, seed, slash = false 
   const { title, visual, u, vertical } = useRegions();
   // Size to the widest line, counting the slash in front of the second line.
   const widths = lines.map((l, i) => textWidthEm(slash && i === 1 ? `/ ${l.text}` : l.text));
-  const size = Math.min((vertical ? 190 : 210) * u, title.width / Math.max(...widths));
+  const size = Math.min((vertical ? 150 : 210) * u, title.width / Math.max(...widths));
   // In 16:9 the block is centred on the portfolio piece beside it.
   const label = (vertical ? 26 : 22) * u;
   const blockHeight = label * 1.2 + 18 * u + lines.length * size;
@@ -106,8 +109,8 @@ const Production: React.FC = () => {
   const frame = useCurrentFrame();
   const { visual, u, vertical } = useRegions();
   const r = rel(PRODUCTION);
-  const song = frame + hit(PRODUCTION);
-  const rowSize = (vertical ? 27 : 24) * u;
+  const song = frame + hit(...PRODUCTION);
+  const rowSize = (vertical ? 30 : 24) * u;
   const listTop = visual.y - visual.h / 2;
   const specH = visual.h * 0.42;
   return (
@@ -125,7 +128,7 @@ const Production: React.FC = () => {
                 justifyContent: "space-between",
                 borderTop: `1px solid rgba(232,231,227,0.18)`,
                 padding: `${6 * u}px 0`,
-                opacity: flicker(frame, r(PRODUCTION, 2 + i), Infinity, `svc1-row${i}`),
+                opacity: flicker(frame, r(1 + i), Infinity, `svc1-row${i}`),
               }}
             >
               <Mono text={`${playing ? ">" : " "} ${String(i + 1).padStart(2, "0")}  ${name}`} size={rowSize} color={playing ? colors.text : colors.muted} />
@@ -141,7 +144,7 @@ const Production: React.FC = () => {
           top: visual.y + visual.h / 2 - specH,
           width: visual.w,
           height: specH,
-          opacity: flicker(frame, r(PRODUCTION, 3), Infinity, "svc1-spec"),
+          opacity: flicker(frame, r(2), Infinity, "svc1-spec"),
         }}
       >
         <Spectrum song={song} width={visual.w} height={specH} gap={4 * u} />
@@ -156,7 +159,7 @@ const Mixing: React.FC = () => {
   const frame = useCurrentFrame();
   const { visual, u, vertical } = useRegions();
   const r = rel(MIXING);
-  const song = frame + hit(MIXING);
+  const song = frame + hit(...MIXING);
   const waveH = visual.h * 0.55;
   const level = env("level", song);
   // Loudness on a meter-like curve, so the quiet bars still move.
@@ -174,7 +177,7 @@ const Mixing: React.FC = () => {
         <div style={{ marginTop: 14 * u }}>
           <Waveform song={song} width={visual.w} height={waveH} stroke={2.5 * u} />
         </div>
-        <div style={{ marginTop: 26 * u, display: "flex", flexDirection: "column", gap: 12 * u, opacity: flicker(frame, r(MIXING, 3), Infinity, "svc2-m") }}>
+        <div style={{ marginTop: 26 * u, display: "flex", flexDirection: "column", gap: 12 * u, opacity: flicker(frame, r(2), Infinity, "svc2-m") }}>
           {meters.map(([ch, v]) => (
             <div key={ch} style={{ display: "flex", alignItems: "center", gap: 14 * u }}>
               <Mono text={ch} size={20 * u} />
@@ -205,31 +208,30 @@ const Mixing: React.FC = () => {
 // ---------------------------------------------------------------- 03 Cover art
 
 const COVERS: [string, string, number, number][] = [
-  // file, caption, from and to (steps) within the cover art bar
-  ["snake-eyes", "Snake Eyes / Poster", 1, 3],
-  ["staring-at-the-sun", "Staring at the Sun / Poster", 3, 8],
-  ["three-blind-mice", "Three Blind Mice / Poster", 8, 9],
-  ["bus-stop", "Bus Stop / Album cover", 9, 13],
-  ["blurred-vzn", "Blurred VZN / Artwork", 13, 15],
-  ["snake-eyes", "Snake Eyes / Poster", 15, 17],
+  // file, caption, from and to (sixteenths after the service starts)
+  ["snake-eyes", "Snake Eyes / Poster", 0, 5],
+  ["staring-at-the-sun", "Staring at the Sun / Poster", 5, 10],
+  ["three-blind-mice", "Three Blind Mice / Poster", 10, 15],
+  ["bus-stop", "Bus Stop / Album cover", 15, 20],
+  ["blurred-vzn", "Blurred VZN / Artwork", 20, 24],
 ];
 
 const CoverArt: React.FC = () => {
   const { visual, u, vertical } = useRegions();
   const r = rel(COVER_ART);
-  const side = vertical ? Math.min(visual.w, visual.h) * 1.04 : Math.min(visual.w, visual.h) * 1.02;
+  const side = Math.min(visual.w, visual.h) * (vertical ? 1 : 1.02);
   return (
     <AbsoluteFill>
       <ServiceTitle index={3} seed="svc3" lines={[{ text: "cover", at: 0 }, { text: "art", at: 0, italic: true }]} />
       {COVERS.map(([file, caption, s0, s1], i) => (
-        <Cut key={i} name={caption} at={r(COVER_ART, s0)} until={r(COVER_ART, s1)} seed={`svc3-${i}`} shake={12 * u}>
+        <Cut key={i} name={caption} at={r(s0)} until={r(s1)} seed={`svc3-${i}`} shake={12 * u}>
           <Frag
             src={`visual/${file}.jpg`}
             width={side}
             height={side}
             x={visual.x}
             y={visual.y}
-            duration={r(COVER_ART, s1) - r(COVER_ART, s0)}
+            duration={r(s1) - r(s0)}
             zoom={1.05}
             caption={`${String(i + 1).padStart(2, "0")} / ${caption}`}
             captionSize={(vertical ? 24 : 18) * u}
@@ -243,28 +245,29 @@ const CoverArt: React.FC = () => {
 // ---------------------------------------------------------------- 04 Merchandising
 
 const HOODIES: [string, string, number, number][] = [
-  ["charcoal-front", "VZN Logo Hoodie / Charcoal / Front", 1, 3],
-  ["charcoal-back", "VZN Logo Hoodie / Charcoal / Back", 3, 9],
-  ["grey-front", "VZN Logo Hoodie / Grey / Front", 9, 13],
-  ["grey-back", "VZN Logo Hoodie / Grey / Back", 13, 17],
+  // file, caption, from and to (sixteenths after the service starts)
+  ["charcoal-front", "VZN Logo Hoodie / Charcoal / Front", 0, 6],
+  ["charcoal-back", "VZN Logo Hoodie / Charcoal / Back", 6, 12],
+  ["grey-front", "VZN Logo Hoodie / Grey / Front", 12, 18],
+  ["grey-back", "VZN Logo Hoodie / Grey / Back", 18, 24],
 ];
 
 const Merch: React.FC = () => {
   const { visual, u, vertical } = useRegions();
   const r = rel(MERCH);
-  const side = vertical ? Math.min(visual.w, visual.h) * 1.02 : Math.min(visual.w, visual.h) * 0.95;
+  const side = Math.min(visual.w, visual.h) * (vertical ? 1 : 0.95);
   return (
     <AbsoluteFill>
       <ServiceTitle index={4} seed="svc4" lines={[{ text: "merchandising", at: 0 }]} />
       {HOODIES.map(([file, caption, s0, s1], i) => (
-        <Cut key={file} name={caption} at={r(MERCH, s0)} until={r(MERCH, s1)} seed={`svc4-${i}`} shake={8 * u}>
+        <Cut key={file} name={caption} at={r(s0)} until={r(s1)} seed={`svc4-${i}`} shake={8 * u}>
           <Frag
             src={`shop/vzn-logo-hoodie-${file}.jpg`}
             width={side}
             height={side}
             x={visual.x}
             y={visual.y}
-            duration={r(MERCH, s1) - r(MERCH, s0)}
+            duration={r(s1) - r(s0)}
             zoom={1.04}
             card
             caption={caption}
@@ -279,7 +282,7 @@ const Merch: React.FC = () => {
 // ----------------------------------------------------------------
 
 export const ServicesScene: React.FC = () => {
-  const s = (bar: number) => hit(bar) - START;
+  const s = (at: At) => hit(...at) - START;
   return (
     <AbsoluteFill style={{ backgroundColor: colors.bg }}>
       <Cut name="01 music production" at={s(PRODUCTION)} until={s(MIXING)} seed="svc-1">
@@ -291,7 +294,7 @@ export const ServicesScene: React.FC = () => {
       <Cut name="03 cover art" at={s(COVER_ART)} until={s(MERCH)} seed="svc-3">
         <CoverArt />
       </Cut>
-      <Cut name="04 merchandising" at={s(MERCH)} until={s(MERCH + 1)} seed="svc-4">
+      <Cut name="04 merchandising" at={s(MERCH)} until={s(DONE)} seed="svc-4">
         <Merch />
       </Cut>
     </AbsoluteFill>
