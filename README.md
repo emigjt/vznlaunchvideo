@@ -29,15 +29,21 @@ frame, which video compression can't squeeze, so an uncapped render comes out ar
 
 ## The video
 
-The script is set as typography over **Wanderer** (VZN, 122 BPM), one 4-bar phrase per
-line, with every cut landing on a hit of the beat:
+The script is set as typography over **Wanderer** (VZN, 122 BPM), lowercase except
+"Vision Studios", with every cut landing on a hit of the beat. Each piece of the portfolio
+first appears with the service that introduces it:
 
-| Bars | Line | Portfolio |
+| Bars | Line | On screen |
 |---|---|---|
-| 1–4 | Every artist has a vision. | posters flash for a frame on the downbeats; "vision" becomes the eye logo |
-| 5–8 | At Vision Studios, we help bring that vision to life. | a poster per bar; the work strobes on "life" |
-| 9–12 | Music production / Mixing, Mastering / Cover art / Merchandising | beat catalogue and live spectrum; live waveform and meters; artwork cutting on the 808s; the hoodie |
-| 13–16 | Don't let it all slow you down from creating. Vision Studios: Your sound. Your vision. | the work flickers around "creating"; logo lockup and site address |
+| 1–4 | every artist has a vision. | one word per hit; "vision." becomes the eye logo |
+| 5–6 | at Vision Studios, we bring that vision to life. | type only, building down the screen a word on nearly every other sixteenth |
+| 7 | music production | the beat catalogue and a live spectrum |
+| 8 | mixing / mastering | a live waveform and level meters |
+| 9 | cover art | the posters and album cover, cutting on the hits |
+| 10 | merchandising | the hoodie, flipping front and back |
+| 11–12 | don't let it get in the way of creation. | one word or phrase per hit from the loudest downbeat; the work flickers around "creation." |
+| 13–14 | let us help build your vision. | one word or phrase per hit |
+| 15–16 | Vision Studios: your sound. your vision. | logo lockup and site address |
 
 Look: black and bone, greyscale only, Hitchcut for the words ("vision" slanted) and Patchcode
 for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the

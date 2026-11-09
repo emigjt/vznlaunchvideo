@@ -93,11 +93,13 @@ type MonoProps = {
   delay?: number;
   /** Shows a block cursor while typing. */
   cursor?: boolean;
+  /** Set in capitals (the HUD); the script itself stays lowercase. */
+  upper?: boolean;
   style?: React.CSSProperties;
 };
 
 /** Small terminal-style label in Patchcode, optionally typed on. */
-export const Mono: React.FC<MonoProps> = ({ text, size, color = colors.text, typeSpeed = 0, delay = 0, cursor = false, style }) => {
+export const Mono: React.FC<MonoProps> = ({ text, size, color = colors.text, typeSpeed = 0, delay = 0, cursor = false, upper = true, style }) => {
   const frame = useCurrentFrame();
   const shown = typeSpeed > 0 ? Math.max(0, Math.min(text.length, Math.floor((frame - delay) * typeSpeed))) : text.length;
   const typing = typeSpeed > 0 && shown < text.length && frame >= delay;
@@ -108,7 +110,7 @@ export const Mono: React.FC<MonoProps> = ({ text, size, color = colors.text, typ
         fontSize: size,
         lineHeight: 1.2,
         letterSpacing: "0.04em",
-        textTransform: "uppercase",
+        textTransform: upper ? "uppercase" : "none",
         color,
         whiteSpace: "pre",
         ...style,
@@ -139,7 +141,7 @@ export const ScriptLine: React.FC<ScriptLineProps> = ({ words, size, bottom, col
     <div style={{ position: "absolute", left: 0, right: 0, bottom, display: "flex", justifyContent: "center", gap: `0 ${size * 0.6}px`, flexWrap: "wrap" }}>
       {words.map(([w, at], i) => (
         <span key={i} style={{ opacity: flicker(frame, at, Infinity, `${seed}-${i}`) }}>
-          <Mono text={w} size={size} color={color} />
+          <Mono text={w} size={size} color={color} upper={false} />
         </span>
       ))}
     </div>

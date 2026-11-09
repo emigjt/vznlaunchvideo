@@ -18,8 +18,11 @@ export const hit = (bar: number, step = 1): number =>
 export const BEAT = (60 / BPM) * FPS;
 export const BAR = BEAT * 4;
 
-/** First frame of each scene: one 4-bar phrase (one line of the script) each. */
-export const SCENE_START = [0, hit(5), hit(9), hit(13)] as const;
+/**
+ * First frame of each scene: the opening line (bars 1–4), "at Vision Studios…" (bars 5–6),
+ * the services (bars 7–10, one each), and the close (bars 11–16 and the tail).
+ */
+export const SCENE_START = [0, hit(5), hit(7), hit(11)] as const;
 export const MUSIC_END = Math.round(31.475 * FPS);
 /** The end card holds a little past the music. */
 export const TOTAL = MUSIC_END + Math.round(1.5 * FPS);

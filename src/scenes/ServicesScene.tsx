@@ -11,11 +11,16 @@ import { Frag } from "../fx/Frag";
 import { useLayout } from "../fx/layout";
 import { Mono } from "../fx/Type";
 
-// Bars 9–12: "Music production, Mixing/Mastering, Cover art, Merchandising."
+// Bars 7–10: "music production, mixing/mastering, cover art, merchandising."
 // One service per bar, each cut in on the downbeat with its own piece of the portfolio:
 // the beat catalogue and a live spectrum, a live waveform with level meters, a montage of
 // the artwork cutting on the 808s, and the hoodie flipping on the hits.
 const START = SCENE_START[2];
+// One service per bar. Each one's portfolio pieces appear only from its own bar on.
+const PRODUCTION = 7;
+const MIXING = 8;
+const COVER_ART = 9;
+const MERCH = 10;
 const SONG = staticFile("audio/wanderer.mp3");
 
 /** Frame of a hit relative to a service that starts on the downbeat of `firstBar`. */
@@ -102,8 +107,8 @@ const Production: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { visual, u, vertical } = useRegions();
-  const r = rel(9);
-  const song = frame + hit(9);
+  const r = rel(PRODUCTION);
+  const song = frame + hit(PRODUCTION);
   const { audioData, dataOffsetInSeconds } = useWindowedAudioData({ src: SONG, frame: song, fps, windowInSeconds: 8 });
   const raw = audioData
     ? visualizeAudio({ fps, frame: song, audioData, numberOfSamples: 256, optimizeFor: "speed", dataOffsetInSeconds })
@@ -120,7 +125,7 @@ const Production: React.FC = () => {
   const specH = visual.h * 0.42;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={1} seed="svc1" lines={[{ text: "Music", at: 0 }, { text: "production", at: r(9, 9) }]} />
+      <ServiceTitle index={1} seed="svc1" lines={[{ text: "music", at: 0 }, { text: "production", at: r(PRODUCTION, 9) }]} />
       <div style={{ position: "absolute", left: visual.x - visual.w / 2, top: listTop, width: visual.w }}>
         <Mono text="VZN / Beats" size={rowSize} color={colors.muted} style={{ marginBottom: 12 * u }} />
         {BEATS.map(([name, bpm, len], i) => {
@@ -133,7 +138,7 @@ const Production: React.FC = () => {
                 justifyContent: "space-between",
                 borderTop: `1px solid rgba(232,231,227,0.18)`,
                 padding: `${6 * u}px 0`,
-                opacity: flicker(frame, r(9, 2 + i), Infinity, `svc1-row${i}`),
+                opacity: flicker(frame, r(PRODUCTION, 2 + i), Infinity, `svc1-row${i}`),
               }}
             >
               <Mono text={`${playing ? ">" : " "} ${String(i + 1).padStart(2, "0")}  ${name}`} size={rowSize} color={playing ? colors.text : colors.muted} />
@@ -152,7 +157,7 @@ const Production: React.FC = () => {
           display: "flex",
           alignItems: "flex-end",
           gap: 4 * u,
-          opacity: flicker(frame, r(9, 9), Infinity, "svc1-spec"),
+          opacity: flicker(frame, r(PRODUCTION, 9), Infinity, "svc1-spec"),
         }}
       >
         {freqs.map((v, i) => (
@@ -169,8 +174,8 @@ const Mixing: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { visual, u, vertical } = useRegions();
-  const r = rel(10);
-  const song = frame + hit(10);
+  const r = rel(MIXING);
+  const song = frame + hit(MIXING);
   const { audioData, dataOffsetInSeconds } = useWindowedAudioData({ src: SONG, frame: song, fps, windowInSeconds: 8 });
   const waveH = visual.h * 0.55;
   const wave = audioData
@@ -189,14 +194,14 @@ const Mixing: React.FC = () => {
   const top = visual.y - visual.h / 2;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={2} seed="svc2" slash lines={[{ text: "Mixing", at: 0 }, { text: "Mastering", at: r(10, 9) }]} />
+      <ServiceTitle index={2} seed="svc2" slash lines={[{ text: "mixing", at: 0 }, { text: "mastering", at: r(MIXING, 9) }]} />
       <div style={{ position: "absolute", left: visual.x - visual.w / 2, top, width: visual.w }}>
         <Mono text="Wanderer / Master bus" size={(vertical ? 26 : 20) * u} color={colors.muted} />
         <svg width={visual.w} height={waveH} style={{ display: "block", marginTop: 14 * u, overflow: "visible" }}>
           <line x1={0} x2={visual.w} y1={waveH / 2} y2={waveH / 2} stroke={colors.muted} strokeWidth={1} strokeDasharray="4 6" />
           <path d={path} fill="none" stroke={colors.text} strokeWidth={2.5 * u} />
         </svg>
-        <div style={{ marginTop: 26 * u, display: "flex", flexDirection: "column", gap: 12 * u, opacity: flicker(frame, r(10, 3), Infinity, "svc2-m") }}>
+        <div style={{ marginTop: 26 * u, display: "flex", flexDirection: "column", gap: 12 * u, opacity: flicker(frame, r(MIXING, 3), Infinity, "svc2-m") }}>
           {meters.map(([ch, v]) => (
             <div key={ch} style={{ display: "flex", alignItems: "center", gap: 14 * u }}>
               <Mono text={ch} size={20 * u} />
@@ -227,7 +232,7 @@ const Mixing: React.FC = () => {
 // ---------------------------------------------------------------- 03 Cover art
 
 const COVERS: [string, string, number, number][] = [
-  // file, caption, from (bar, step) of bar 11
+  // file, caption, from and to (steps) within the cover art bar
   ["snake-eyes", "Snake Eyes / Poster", 1, 3],
   ["staring-at-the-sun", "Staring at the Sun / Poster", 3, 8],
   ["three-blind-mice", "Three Blind Mice / Poster", 8, 9],
@@ -238,20 +243,20 @@ const COVERS: [string, string, number, number][] = [
 
 const CoverArt: React.FC = () => {
   const { visual, u, vertical } = useRegions();
-  const r = rel(11);
+  const r = rel(COVER_ART);
   const side = vertical ? Math.min(visual.w, visual.h) * 1.04 : Math.min(visual.w, visual.h) * 1.02;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={3} seed="svc3" lines={[{ text: "Cover", at: 0 }, { text: "art", at: r(11, 3), italic: true }]} />
+      <ServiceTitle index={3} seed="svc3" lines={[{ text: "cover", at: 0 }, { text: "art", at: r(COVER_ART, 3), italic: true }]} />
       {COVERS.map(([file, caption, s0, s1], i) => (
-        <Cut key={i} name={caption} at={r(11, s0)} until={r(11, s1)} seed={`svc3-${i}`} shake={12 * u}>
+        <Cut key={i} name={caption} at={r(COVER_ART, s0)} until={r(COVER_ART, s1)} seed={`svc3-${i}`} shake={12 * u}>
           <Frag
             src={`visual/${file}.jpg`}
             width={side}
             height={side}
             x={visual.x}
             y={visual.y}
-            duration={r(11, s1) - r(11, s0)}
+            duration={r(COVER_ART, s1) - r(COVER_ART, s0)}
             zoom={1.05}
             caption={`${String(i + 1).padStart(2, "0")} / ${caption}`}
             captionSize={(vertical ? 24 : 18) * u}
@@ -273,20 +278,20 @@ const HOODIES: [string, string, number, number][] = [
 
 const Merch: React.FC = () => {
   const { visual, u, vertical } = useRegions();
-  const r = rel(12);
+  const r = rel(MERCH);
   const side = vertical ? Math.min(visual.w, visual.h) * 1.02 : Math.min(visual.w, visual.h) * 0.95;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={4} seed="svc4" lines={[{ text: "Merchandising", at: 0 }]} />
+      <ServiceTitle index={4} seed="svc4" lines={[{ text: "merchandising", at: 0 }]} />
       {HOODIES.map(([file, caption, s0, s1], i) => (
-        <Cut key={file} name={caption} at={r(12, s0)} until={r(12, s1)} seed={`svc4-${i}`} shake={8 * u}>
+        <Cut key={file} name={caption} at={r(MERCH, s0)} until={r(MERCH, s1)} seed={`svc4-${i}`} shake={8 * u}>
           <Frag
             src={`shop/vzn-logo-hoodie-${file}.jpg`}
             width={side}
             height={side}
             x={visual.x}
             y={visual.y}
-            duration={r(12, s1) - r(12, s0)}
+            duration={r(MERCH, s1) - r(MERCH, s0)}
             zoom={1.04}
             card
             caption={caption}
@@ -304,16 +309,16 @@ export const ServicesScene: React.FC = () => {
   const s = (bar: number) => hit(bar) - START;
   return (
     <AbsoluteFill style={{ backgroundColor: colors.bg }}>
-      <Cut name="01 Music production" at={s(9)} until={s(10)} seed="svc-1">
+      <Cut name="01 music production" at={s(PRODUCTION)} until={s(MIXING)} seed="svc-1">
         <Production />
       </Cut>
-      <Cut name="02 Mixing / Mastering" at={s(10)} until={s(11)} seed="svc-2">
+      <Cut name="02 mixing / mastering" at={s(MIXING)} until={s(COVER_ART)} seed="svc-2">
         <Mixing />
       </Cut>
-      <Cut name="03 Cover art" at={s(11)} until={s(12)} seed="svc-3">
+      <Cut name="03 cover art" at={s(COVER_ART)} until={s(MERCH)} seed="svc-3">
         <CoverArt />
       </Cut>
-      <Cut name="04 Merchandising" at={s(12)} until={s(13)} seed="svc-4">
+      <Cut name="04 merchandising" at={s(MERCH)} until={s(MERCH + 1)} seed="svc-4">
         <Merch />
       </Cut>
     </AbsoluteFill>
