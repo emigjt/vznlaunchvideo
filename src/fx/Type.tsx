@@ -1,9 +1,8 @@
 import React from "react";
-import { Interactive, useCurrentFrame } from "remotion";
+import { Easing, Interactive, interpolate, useCurrentFrame } from "remotion";
 import { colors, display, fonts } from "../brand";
 import { fitSize, type Face } from "../metrics";
 import { flicker } from "./flicker";
-import { enterPose, Kinetic, type Enter } from "./Motion";
 
 const family: Record<Face, React.CSSProperties> = {
   bold: { fontFamily: fonts.display, fontStyle: "normal" },
@@ -27,23 +26,14 @@ type WordProps = {
   color?: string;
   /** Letter spacing in em. */
   tracking?: number;
-  /** How it arrives, and how far it travels to get there (px). */
-  enter?: Enter;
-  dist?: number;
-  seed?: string;
   /** How much it slowly grows while it holds (0.04 = 4%), over `duration` frames. */
   push?: number;
   duration?: number;
-  /** Slow slide (px) and turn (deg) while it holds. */
-  drift?: [number, number];
-  spin?: number;
-  /** Turned on its side, reading bottom to top (size it to the frame's height). */
-  turn?: boolean;
   /** Where it sits; defaults to the centre of its parent. */
   style?: React.CSSProperties;
 };
 
-/** One big word (or a few) in the display font: sized to fit, arriving on its hit, then drifting. */
+/** One big word (or a few) in the display font, sized to fit and drifting slowly toward the viewer. */
 export const Word: React.FC<WordProps> = ({
   text,
   face = "bold",
@@ -51,89 +41,45 @@ export const Word: React.FC<WordProps> = ({
   maxSize,
   color = colors.text,
   tracking = -0.01,
-  enter = "punch",
-  dist = 600,
-  seed,
-  push = 0.05,
+  push = 0.04,
   duration = 60,
-  drift,
-  spin,
-  turn = false,
   style,
 }) => {
+  const frame = useCurrentFrame();
   const size = fitSize(text, maxWidth, maxSize, face, tracking);
   return (
-    <Interactive.Div name={text} style={{ position: "absolute", inset: 0, ...style }}>
-      <Kinetic enter={enter} dist={dist} seed={seed ?? text} duration={duration} push={push} drift={drift} spin={spin}>
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <div
-            style={{
-              ...family[face],
-              fontSize: size,
-              lineHeight: 1,
-              letterSpacing: `${tracking}em`,
-              ...ink(face, color),
-              whiteSpace: "pre",
-              // Capitals sit low in the line box; lift them to the optical centre.
-              position: "relative",
-              top: display.lift,
-              rotate: turn ? "-90deg" : undefined,
-            }}
-          >
-            {text}
-          </div>
-        </div>
-      </Kinetic>
-    </Interactive.Div>
-  );
-};
-
-type InlineWordProps = {
-  text: string;
-  /** Frame it lands (relative to the parent sequence). */
-  at: number;
-  size: number;
-  enter?: Enter;
-  face?: Face;
-  color?: string;
-  seed: string;
-  style?: React.CSSProperties;
-};
-
-/**
- * A word inside a line of text: it flickers in on its hit, travelling a short way with a
- * smear (drawn as trailing text shadows, so the line's layout never moves).
- */
-export const InlineWord: React.FC<InlineWordProps> = ({ text, at, size, enter = "rise", face = "bold", color = colors.text, seed, style }) => {
-  const frame = useCurrentFrame();
-  const t = frame - at;
-  const now = enterPose(t, enter, size * 0.9, seed, 5);
-  const prev = enterPose(t - 1.5, enter, size * 0.9, seed, 5);
-  const vx = prev.x - now.x;
-  const vy = prev.y - now.y;
-  const moving = t >= 0 && t < 5 && (Math.abs(vx) > 0.5 || Math.abs(vy) > 0.5);
-  return (
-    <span
+    <Interactive.Div
+      name={text}
       style={{
-        display: "inline-block",
-        ...family[face],
-        fontSize: size,
-        lineHeight: 1,
-        letterSpacing: "-0.01em",
-        ...ink(face, color),
-        whiteSpace: "pre",
-        opacity: flicker(frame, at, Infinity, seed),
-        translate: `${now.x}px ${now.y}px`,
-        scale: `${now.scale * now.sx} ${now.scale}`,
-        rotate: `${now.rot}deg`,
-        textShadow: moving
-          ? [0.35, 0.7, 1.05, 1.4].map((k, i) => `${vx * k}px ${vy * k}px 0 rgba(232,231,227,${0.4 - i * 0.09})`).join(", ")
-          : undefined,
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         ...style,
       }}
     >
-      {text}
-    </span>
+      <div
+        style={{
+          ...family[face],
+          fontSize: size,
+          lineHeight: 1,
+          letterSpacing: `${tracking}em`,
+          ...ink(face, color),
+          whiteSpace: "pre",
+          // Capitals sit low in the line box; lift them to the optical centre.
+          position: "relative",
+          top: display.lift,
+          scale: interpolate(frame, [0, duration], [1, 1 + push], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+          }),
+        }}
+      >
+        {text}
+      </div>
+    </Interactive.Div>
   );
 };
 
@@ -147,13 +93,11 @@ type MonoProps = {
   delay?: number;
   /** Shows a block cursor while typing. */
   cursor?: boolean;
-  /** Set in capitals (the HUD); the script itself stays lowercase. */
-  upper?: boolean;
   style?: React.CSSProperties;
 };
 
 /** Small terminal-style label in Patchcode, optionally typed on. */
-export const Mono: React.FC<MonoProps> = ({ text, size, color = colors.text, typeSpeed = 0, delay = 0, cursor = false, upper = true, style }) => {
+export const Mono: React.FC<MonoProps> = ({ text, size, color = colors.text, typeSpeed = 0, delay = 0, cursor = false, style }) => {
   const frame = useCurrentFrame();
   const shown = typeSpeed > 0 ? Math.max(0, Math.min(text.length, Math.floor((frame - delay) * typeSpeed))) : text.length;
   const typing = typeSpeed > 0 && shown < text.length && frame >= delay;
@@ -164,7 +108,7 @@ export const Mono: React.FC<MonoProps> = ({ text, size, color = colors.text, typ
         fontSize: size,
         lineHeight: 1.2,
         letterSpacing: "0.04em",
-        textTransform: upper ? "uppercase" : "none",
+        textTransform: "uppercase",
         color,
         whiteSpace: "pre",
         ...style,
@@ -195,7 +139,7 @@ export const ScriptLine: React.FC<ScriptLineProps> = ({ words, size, bottom, col
     <div style={{ position: "absolute", left: 0, right: 0, bottom, display: "flex", justifyContent: "center", gap: `0 ${size * 0.6}px`, flexWrap: "wrap" }}>
       {words.map(([w, at], i) => (
         <span key={i} style={{ opacity: flicker(frame, at, Infinity, `${seed}-${i}`) }}>
-          <Mono text={w} size={size} color={color} upper={false} />
+          <Mono text={w} size={size} color={color} />
         </span>
       ))}
     </div>
