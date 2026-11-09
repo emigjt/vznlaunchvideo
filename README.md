@@ -29,21 +29,25 @@ frame, which video compression can't squeeze, so an uncapped render comes out ar
 
 ## The video
 
-The script is set as typography over **Wanderer** (VZN, 122 BPM), one 4-bar phrase per
-line, with every cut landing on a hit of the beat:
+The script is set as typography over **Wanderer** (VZN, 122 BPM), lowercase except
+"Vision Studios", with every cut and camera move landing on a hit of the beat:
 
-| Bars | Line | Portfolio |
+| Bars | Line | Treatment |
 |---|---|---|
-| 1–4 | Every artist has a vision. | posters flash for a frame on the downbeats; "vision" becomes the eye logo |
-| 5–8 | At Vision Studios, we help bring that vision to life. | a poster per bar; the work strobes on "life" |
-| 9–12 | Music production / Mixing, Mastering / Cover art / Merchandising | beat catalogue and live spectrum; live waveform and meters; artwork cutting on the 808s; the hoodie |
-| 13–16 | Don't let it all slow you down from creating. Vision Studios: Your sound. Your vision. | the work flickers around "creating"; logo lockup and site address |
+| 1–4 | every artist has a vision. | typed like a terminal, then one word per hit (punch, whip, turned on its side, giant outline); "vision." bent through a lens; the camera dives into the eye |
+| 5–8 | at Vision Studios, we bring that vision to life. | lines snap up like a teleprompter; posters whip in; the work strobes on "life."; the picture collapses like a TV switching off |
+| 9–12 | music production, mixing/mastering, cover art, merchandising. | one service per bar with whip pans; beat catalogue and live spectrum, live waveform and meters, covers slamming in on the 808s, the hoodie flipping |
+| 13–14 | don't let it get in the way of creation. | interference bars and static pile up over the words until "creation." breaks through, the work flashing around it |
+| 15 | let us help build your vision. | the loudest bar: "build" drops in letter by letter; "vision." bent again |
+| 16 | Vision Studios: your sound. your vision. | the logo slams in; sign-off and site address |
 
-Look: black and bone, greyscale only, Hitchcut for the words ("vision" slanted) and Patchcode
-for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the
-website's face). Cuts are hard and stutter for a frame or two on the
-way in and out; heavy hits add a white flash, an inverted frame, a tape tear or a small
-shake. Film grain and scratches change every frame.
+Look: black and bone, greyscale only, Hitchcut for the words and Patchcode for the HUD.
+`DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the website's face).
+Nothing sits still: words arrive fast and smeared (`src/fx/Motion.tsx`), the camera sways,
+punches on the kicks and dives, whips or squeezes through the cuts, and the picture
+flickers, drops out, doubles, tears, mirrors and fills with static on the hits
+(`src/LaunchVideo.tsx`). Light streaks rush past like a tunnel, faster when the track is
+louder. Film grain, scratches and scanlines change every frame.
 
 In 9:16 the type and artwork stay out of the bottom fifth and the right edge, where the
 apps put their caption and buttons.
@@ -54,7 +58,7 @@ apps put their caption and buttons.
   counted like the music, bar 1–16, step 1–16). Scenes place everything with it.
 - **Words and images:** one file per scene in `src/scenes/`.
 - **Site address on the end card:** `SITE_URL` in `src/brand.ts`.
-- **Flashes and tears:** the `WHITE`, `INVERT` and `GLITCH` lists in `src/LaunchVideo.tsx`.
+- **Camera moves, flashes and damage:** the lists at the top of `src/LaunchVideo.tsx` (punches, dives, whips, squeezes, white and inverted frames, mirrors, tears, static).
 
 ## Structure
 
@@ -62,8 +66,10 @@ apps put their caption and buttons.
 src/Root.tsx            Compositions
 src/LaunchVideo.tsx     The full video: scenes in order, music, flashes, tears, grain, HUD
 src/scenes/             VisionScene, StudioScene, ServicesScene, CreateScene (one per phrase)
-src/fx/                 Cut (flickering layer), Word and Mono (type), Frag (artwork),
-                        Logo, Slices (tape tear), HUD, Grain, Scratches, layout
+src/fx/                 Cut (flickering layer), Motion (arrivals with smear), Word, InlineWord
+                        and Mono (type), Bent (lens-warped word), Frag (artwork), Logo,
+                        Slices (tape tear), Overlays (static, scanlines, glitch lines, tunnel
+                        streaks, echoes), HUD, Grain, Scratches, layout
 src/beat.ts             Beat grid of Wanderer
 src/audio-envelope.ts   Per-frame bass, loudness and hit levels of Wanderer (precomputed)
 src/metrics.ts          Display font glyph widths, to size words to the frame

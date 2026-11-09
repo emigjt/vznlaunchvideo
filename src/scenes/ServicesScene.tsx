@@ -9,9 +9,10 @@ import { Cut } from "../fx/Cut";
 import { flicker } from "../fx/flicker";
 import { Frag } from "../fx/Frag";
 import { useLayout } from "../fx/layout";
-import { Mono } from "../fx/Type";
+import { ink, InlineWord, Mono } from "../fx/Type";
+import { Kinetic } from "../fx/Motion";
 
-// Bars 9–12: "Music production, Mixing/Mastering, Cover art, Merchandising."
+// Bars 9–12: "music production, mixing/mastering, cover art, merchandising."
 // One service per bar, each cut in on the downbeat with its own piece of the portfolio:
 // the beat catalogue and a live spectrum, a live waveform with level meters, a montage of
 // the artwork cutting on the 808s, and the hoodie flipping on the hits.
@@ -40,49 +41,54 @@ const useRegions = () => {
   };
 };
 
-type TitleProps = { index: number; lines: { text: string; at: number; italic?: boolean }[]; seed: string; slash?: boolean };
+type TitleProps = { index: number; lines: { text: string; at: number; slant?: boolean }[]; seed: string; slash?: boolean };
 
-/** "Services 0X/04" and the service name, a line per hit. */
+/** "services 0X/04", the service name whipping in a line per hit, and a giant outlined number. */
 const ServiceTitle: React.FC<TitleProps> = ({ index, lines, seed, slash = false }) => {
   const frame = useCurrentFrame();
-  const { title, visual, u, vertical } = useRegions();
-  // Size to the widest line, counting the slash in front of the second line.
-  const widths = lines.map((l, i) => textWidthEm(slash && i === 1 ? `/ ${l.text}` : l.text));
-  const size = Math.min((vertical ? 190 : 210) * u, title.width / Math.max(...widths));
+  const { title, visual, u, vertical, width, height, pad } = useRegions();
+  const texts = lines.map((l, i) => (slash && i === 1 && display.punctuation ? `/ ${l.text}` : l.text));
+  const size = Math.min((vertical ? 190 : 210) * u, title.width / Math.max(...texts.map((t) => textWidthEm(t))));
   // In 16:9 the block is centred on the portfolio piece beside it.
   const label = (vertical ? 26 : 22) * u;
   const blockHeight = label * 1.2 + 18 * u + lines.length * size;
   const top = vertical ? title.top : visual.y - blockHeight / 2;
+  const num = String(index).padStart(2, "0");
+  const numSize = height * 0.3;
   return (
-    <div style={{ position: "absolute", left: title.left, top, width: title.width }}>
-      <Mono text={`Services ${String(index).padStart(2, "0")}/04`} size={label} color={colors.muted} style={{ marginBottom: 18 * u }} />
-      {lines.map((l, i) => (
-        <div
-          key={i}
-          style={{
-            fontFamily: fonts.display,
-            fontStyle: l.italic ? "italic" : "normal",
-            fontSize: size,
-            lineHeight: 1,
-            letterSpacing: "-0.015em",
-            color: colors.text,
-            opacity: flicker(frame, l.at, Infinity, `${seed}-${i}`),
-            display: "flex",
-            alignItems: "center",
-            gap: size * 0.18,
-          }}
-        >
-          {slash && i === 1 ? (
-            display.punctuation ? (
-              <span>/</span>
-            ) : (
-              <span style={{ display: "inline-block", width: size * 0.05, height: size * 0.62, background: colors.text, rotate: "22deg" }} />
-            )
-          ) : null}
-          {l.text}
-        </div>
-      ))}
-    </div>
+    <>
+      {/* The number, outlined and turned on its side along the right edge, sliding slowly up. */}
+      <div
+        style={{
+          position: "absolute",
+          left: width - pad * 0.6 - numSize * 0.5,
+          top: top + blockHeight / 2 - numSize * 0.5 - frame * 0.6 * u,
+          width: numSize,
+          height: numSize,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: 0.32 * flicker(frame, 0, Infinity, `${seed}-num`),
+        }}
+      >
+        <div style={{ fontFamily: fonts.display, fontSize: numSize * 0.55, lineHeight: 1, rotate: "-90deg", ...ink("outline", colors.text) }}>{num}</div>
+      </div>
+      <div style={{ position: "absolute", left: title.left, top, width: title.width }}>
+        <Mono text={`services ${num}/04`} size={label} color={colors.muted} upper={false} style={{ marginBottom: 18 * u }} />
+        {lines.map((l, i) => (
+          <div key={i} style={{ height: size, display: "flex", alignItems: "center" }}>
+            <InlineWord
+              text={texts[i]}
+              at={l.at}
+              size={size}
+              face={l.slant ? "italic" : "bold"}
+              enter={i % 2 === 0 ? "whip-left" : "whip-right"}
+              seed={`${seed}-${i}`}
+            />
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -120,7 +126,7 @@ const Production: React.FC = () => {
   const specH = visual.h * 0.42;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={1} seed="svc1" lines={[{ text: "Music", at: 0 }, { text: "production", at: r(9, 9) }]} />
+      <ServiceTitle index={1} seed="svc1" lines={[{ text: "music", at: 0 }, { text: "production", at: r(9, 9) }]} />
       <div style={{ position: "absolute", left: visual.x - visual.w / 2, top: listTop, width: visual.w }}>
         <Mono text="VZN / Beats" size={rowSize} color={colors.muted} style={{ marginBottom: 12 * u }} />
         {BEATS.map(([name, bpm, len], i) => {
@@ -134,6 +140,7 @@ const Production: React.FC = () => {
                 borderTop: `1px solid rgba(232,231,227,0.18)`,
                 padding: `${6 * u}px 0`,
                 opacity: flicker(frame, r(9, 2 + i), Infinity, `svc1-row${i}`),
+                translate: `${Math.max(0, 1 - (frame - r(9, 2 + i)) / 4) ** 2 * 120 * u}px 0px`,
               }}
             >
               <Mono text={`${playing ? ">" : " "} ${String(i + 1).padStart(2, "0")}  ${name}`} size={rowSize} color={playing ? colors.text : colors.muted} />
@@ -189,7 +196,7 @@ const Mixing: React.FC = () => {
   const top = visual.y - visual.h / 2;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={2} seed="svc2" slash lines={[{ text: "Mixing", at: 0 }, { text: "Mastering", at: r(10, 9) }]} />
+      <ServiceTitle index={2} seed="svc2" slash lines={[{ text: "mixing", at: 0 }, { text: "mastering", at: r(10, 9) }]} />
       <div style={{ position: "absolute", left: visual.x - visual.w / 2, top, width: visual.w }}>
         <Mono text="Wanderer / Master bus" size={(vertical ? 26 : 20) * u} color={colors.muted} />
         <svg width={visual.w} height={waveH} style={{ display: "block", marginTop: 14 * u, overflow: "visible" }}>
@@ -242,9 +249,17 @@ const CoverArt: React.FC = () => {
   const side = vertical ? Math.min(visual.w, visual.h) * 1.04 : Math.min(visual.w, visual.h) * 1.02;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={3} seed="svc3" lines={[{ text: "Cover", at: 0 }, { text: "art", at: r(11, 3), italic: true }]} />
+      <ServiceTitle index={3} seed="svc3" lines={[{ text: "cover", at: 0 }, { text: "art", at: r(11, 3), slant: true }]} />
       {COVERS.map(([file, caption, s0, s1], i) => (
         <Cut key={i} name={caption} at={r(11, s0)} until={r(11, s1)} seed={`svc3-${i}`} shake={12 * u}>
+          <Kinetic
+            enter={i % 2 === 0 ? "slam" : "punch"}
+            len={4}
+            seed={`svc3-k${i}`}
+            duration={r(11, s1) - r(11, s0)}
+            push={0.06}
+            origin={`${visual.x}px ${visual.y}px`}
+          >
           <Frag
             src={`visual/${file}.jpg`}
             width={side}
@@ -256,6 +271,7 @@ const CoverArt: React.FC = () => {
             caption={`${String(i + 1).padStart(2, "0")} / ${caption}`}
             captionSize={(vertical ? 24 : 18) * u}
           />
+          </Kinetic>
         </Cut>
       ))}
     </AbsoluteFill>
@@ -277,9 +293,10 @@ const Merch: React.FC = () => {
   const side = vertical ? Math.min(visual.w, visual.h) * 1.02 : Math.min(visual.w, visual.h) * 0.95;
   return (
     <AbsoluteFill>
-      <ServiceTitle index={4} seed="svc4" lines={[{ text: "Merchandising", at: 0 }]} />
+      <ServiceTitle index={4} seed="svc4" lines={[{ text: "merchandising", at: 0 }]} />
       {HOODIES.map(([file, caption, s0, s1], i) => (
         <Cut key={file} name={caption} at={r(12, s0)} until={r(12, s1)} seed={`svc4-${i}`} shake={8 * u}>
+          <Kinetic enter="flip" len={4} seed={`svc4-k${i}`} duration={r(12, s1) - r(12, s0)} push={0.03} origin={`${visual.x}px ${visual.y}px`}>
           <Frag
             src={`shop/vzn-logo-hoodie-${file}.jpg`}
             width={side}
@@ -292,6 +309,7 @@ const Merch: React.FC = () => {
             caption={caption}
             captionSize={(vertical ? 24 : 18) * u}
           />
+          </Kinetic>
         </Cut>
       ))}
     </AbsoluteFill>

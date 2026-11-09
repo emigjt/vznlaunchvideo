@@ -17,6 +17,8 @@ type CutProps = {
   shake?: number;
   /** Draws the first frame as a blown-out photocopy. */
   burn?: boolean;
+  /** Leaves on a clean cut, without the stutter (for something the camera is moving into). */
+  cleanExit?: boolean;
   style?: React.CSSProperties;
   children: React.ReactNode;
 };
@@ -38,11 +40,12 @@ const Flicker: React.FC<Omit<CutProps, "name" | "at" | "until"> & { duration: nu
   dropout = 0,
   shake = 0,
   burn = false,
+  cleanExit = false,
   style,
   children,
 }) => {
   const frame = useCurrentFrame();
-  const visible = flicker(frame, 0, duration, seed, dropout);
+  const visible = flicker(frame, 0, cleanExit ? Infinity : duration, seed, dropout);
   const [dx, dy] = jolt(frame, seed, shake);
   return (
     <AbsoluteFill
