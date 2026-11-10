@@ -36,7 +36,7 @@ and the services get the most time:
 
 | Time | Line | On screen |
 |---|---|---|
-| 0–3.9 s | every artist has a vision. | "vision." glitches into the eye logo in its place, and the eye grows to fill the screen |
+| 0–3.9 s | every artist has a vision. | "vision." morphs into the eye logo in its place, and the eye grows to fill the screen |
 | 3.9–7.9 s | at Vision Studios, we bring that vision to life. | the whole line, large, type only |
 | 7.9–9.8 s | whatever you need. | type only |
 | 9.8–12.8 s | music production | the beat catalogue and a live spectrum |
@@ -48,9 +48,9 @@ and the services get the most time:
 | 26.6–29.5 s | let us help build your vision. | across the loudest downbeat |
 | 29.5 s to end | Vision Studios: your sound. your vision. | the logo on the last bar, held 1.5 s past the music |
 
-Look: black and bone, greyscale only, Hitchcut for the words ("vision" slanted) and Patchcode
-for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words back to Coldag Serif (the
-website's face). Cuts are hard and stutter for a frame or two on the
+Look: black and bone, greyscale only, Sactione for the words ("vision" in its italic) and
+Patchcode for the HUD. `DISPLAY_FONT` in `src/brand.ts` switches the words to Hitchcut or to
+Coldag Serif (the website's face). Cuts are hard and stutter for a frame or two on the
 way in and out; heavy hits add a white flash, an inverted frame, a tape tear or a small
 shake. Film grain and scratches change every frame.
 
@@ -78,8 +78,8 @@ src/metrics.ts          Display font glyph widths, to size words to the frame
 src/brand.ts            Colours, fonts, site address
 src/fonts.ts            Loads the self-hosted brand fonts
 public/brand/           Logos (white, black, currentColor)
-public/fonts/           Hitchcut, Coldag Serif (Bold, Italic, Outline), Patchcode;
-                        source/ holds Hitchcut's original OTF and TTF
+public/fonts/           Sactione (Regular, Italic), Hitchcut, Coldag Serif (Bold, Italic,
+                        Outline), Patchcode; source/ holds the uploaded originals
 public/audio/           The seven beats (320 kbps MP3)
 public/visual/          Posters and artwork (1600 px)
 public/shop/            VZN Logo Hoodie, charcoal and grey, front and back

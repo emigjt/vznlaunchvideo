@@ -15,21 +15,16 @@ import { StudioScene } from "./scenes/StudioScene";
 import { VisionScene } from "./scenes/VisionScene";
 
 // Hits that get a full-frame flash: one frame of bone, then one frame of the picture
-// inverted. "vision." becoming the eye, cover art (where the track gets fuller), the loudest
-// downbeat (during "let us help build your vision.") and the logo. Lines and services that
-// land on a downbeat open on an inverted frame.
-const WHITE = new Set([hit(2, 9), hit(9, 1), hit(15, 1), hit(16, 1)]);
-const INVERT = new Set([hit(2, 9) + 1, hit(3, 1), hit(6, 1), hit(9, 1) + 1, hit(12, 1), hit(15, 1) + 1, hit(16, 1) + 1]);
+// inverted. Cover art (where the track gets fuller), the loudest downbeat (during "let us
+// help build your vision.") and the logo. Lines and services that land on a downbeat open on
+// an inverted frame. "vision." turning into the eye gets none, so the morph stays seamless.
+const WHITE = new Set([hit(9, 1), hit(15, 1), hit(16, 1)]);
+const INVERT = new Set([hit(3, 1), hit(6, 1), hit(9, 1) + 1, hit(12, 1), hit(15, 1) + 1, hit(16, 1) + 1]);
 
-// Frames where the picture tears sideways: "vision." glitching into the eye, the 808 fills
-// that close each phrase, the services changing on the claps, and the logo landing.
+// Frames where the picture tears sideways: the 808 fills that close each phrase, the
+// services changing on the claps, and the logo landing.
 const tear = (bar: number, step: number) => [hit(bar, step), hit(bar, step) + 1];
 const GLITCH = new Set([
-  hit(2, 4),
-  hit(2, 6),
-  hit(2, 8),
-  hit(2, 9) + 2,
-  hit(2, 9) + 3,
   ...tear(4, 13),
   ...tear(4, 15),
   ...tear(7, 9),
